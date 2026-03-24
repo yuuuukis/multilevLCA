@@ -1,7 +1,7 @@
 Package: multilevLCA
 Type: Package
-Version: 2.1.2
-Date: 2025-10-08
+Version: 2.1.4
+Date: 2026-03-24
 Title: Estimates and Plots Single-Level and Multilevel Latent Class
         Models
 Description: Efficiently estimates single- and multilevel latent class models with covariates, allowing for output visualization in all specifications. For more technical details, see Lyrvall et al. (2025) <doi:10.1080/00273171.2025.2473935>.
@@ -23,6 +23,6 @@ Author: Roberto Di Mari [aut, cre],
   Jennifer Oser [ctb],
   Jouni Kuha [ctb]
 Maintainer: Roberto Di Mari <roberto.dimari@unict.it>
-Packaged: 2025-11-06 14:29:05 UTC; robmachine
+Packaged: 2026-03-24 11:05:59 UTC; roberto
 Repository: CRAN
-Date/Publication: 2025-11-06 15:00:02 UTC
+Date/Publication: 2026-03-24 11:20:02 UTC

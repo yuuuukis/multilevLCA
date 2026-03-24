@@ -326,19 +326,29 @@ List MLTLCA_covWfixedlowhigh_poly_includeall(arma::mat mY, arma::mat mDesign, ar
   AIC = -2.0*LLKSeries(iter-1) + 2.0*(iT*nfreepar_res + (iT - 1.0)*iP*iM + (iM - 1.0)*iPh);
   
   // computing log-linear parameters
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
   arma::vec vPW = mean(mPW).t();
   double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   double ICL_BIClow;
@@ -438,11 +448,11 @@ List MLTLCA_covWfixedlowhigh_poly_includeall(arma::mat mY, arma::mat mDesign, ar
   int uncondLatpars   = (iM-1) + (iT-1)*iM;
   // int parsfree        = (iT - 1)*iP*iM + (iM - 1)*iPh;
   int parsfree        = 1 + (iM - 1) + (iT - 1)*iP + (iM - 1)*iPh;
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16); 
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + nfreepar_res-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + nfreepar_res-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -815,19 +825,29 @@ List MLTLCA_covWfixedlowhigh_poly(arma::mat mY, arma::mat mZ, arma::mat mZh, arm
   AIC = -2.0*LLKSeries(iter-1) + 2.0*(iT*nfreepar_res + (iT - 1.0)*iP*iM + (iM - 1.0)*iPh);
   
   // computing log-linear parameters
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
   arma::vec vPW = mean(mPW).t();
   double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   double ICL_BIClow;
@@ -928,11 +948,11 @@ List MLTLCA_covWfixedlowhigh_poly(arma::mat mY, arma::mat mZ, arma::mat mZh, arm
   int uncondLatpars   = (iM-1) + (iT-1)*iM;
   // int parsfree        = (iT - 1)*iP*iM + (iM - 1)*iPh;
   int parsfree        = 1 + (iM - 1) + (iT - 1)*iP + (iM - 1)*iPh;
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16); 
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + nfreepar_res-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + nfreepar_res-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -1318,19 +1338,29 @@ List MLTLCA_covWfixed_poly_includeall(arma::mat mY, arma::mat mDesign, arma::mat
     }
   }
   
-  double Terr_high = iJ*accu(-vOmega%log(vOmega));
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
+  arma::vec vPW = mean(mPW).t();
+  double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
-  
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   
@@ -1401,11 +1431,11 @@ List MLTLCA_covWfixed_poly_includeall(arma::mat mY, arma::mat mDesign, arma::mat
   if(nsteps == 3){
     nfreepar_res = 0;
   }
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16);
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + nfreepar_res-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + nfreepar_res-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -1786,19 +1816,29 @@ List MLTLCA_covWfixed_poly(arma::mat mY, arma::mat mZ, arma::vec vNj, arma::vec 
     }
   }
   
-  double Terr_high = iJ*accu(-vOmega%log(vOmega));
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
+  arma::vec vPW = mean(mPW).t();
+  double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
-  
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   
@@ -1869,11 +1909,11 @@ List MLTLCA_covWfixed_poly(arma::mat mY, arma::mat mZ, arma::vec vNj, arma::vec 
   if(nsteps == 3){
     nfreepar_res = 0;
   }
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16);
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + nfreepar_res-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + nfreepar_res-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -2219,19 +2259,29 @@ List MLTLCA_covlowhigh_poly_includeall(arma::mat mY, arma::mat mDesign, arma::ma
   AIC = -2.0*LLKSeries(iter-1) + 2.0*(iT*nfreepar_res + (iT - 1.0)*iP*iM + (iM - 1.0)*iPh);
   
   // computing log-linear parameters
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
   arma::vec vPW = mean(mPW).t();
   double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   double ICL_BIClow;
@@ -2330,11 +2380,11 @@ List MLTLCA_covlowhigh_poly_includeall(arma::mat mY, arma::mat mDesign, arma::ma
   // asymptotic SEs correction
   int uncondLatpars   = (iM-1) + (iT-1)*iM;
   int parsfree        = (iT - 1)*iP*iM + (iM - 1)*iPh;
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16); 
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + nfreepar_res-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + nfreepar_res-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -2670,19 +2720,29 @@ List MLTLCA_cov_poly_includeall(arma::mat mY, arma::mat mDesign, arma::mat mZ, a
   arma::vec vDelta(iM-1);
   vDelta = vDeltafoo.subvec(1,iM-1);
   
-  double Terr_high = iJ*accu(-vOmega%log(vOmega));
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
+  arma::vec vPW = mean(mPW).t();
+  double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
-  
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   
@@ -2780,11 +2840,11 @@ List MLTLCA_cov_poly_includeall(arma::mat mY, arma::mat mDesign, arma::mat mZ, a
   if(nsteps == 3){
     nfreepar_res = 0;
   }
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16);
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + nfreepar_res-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + nfreepar_res-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -2988,6 +3048,10 @@ List MLTLCA_poly_includeall(arma::mat mY, arma::mat mDesign, arma::vec vNj, arma
         mPMsumX.col(t) = foovec;
       }
     }
+    for(m = 0; m < iM; m++){
+      mPi_Next.col(m) = OmegaCheck(mPi_Next.col(m), iT);
+    }
+    vOmega_Next = OmegaCheck(vOmega_Next, iM);
     
     LLKSeries(iter) = accu(vLLK);
     if(iter > 10){
@@ -3142,19 +3206,29 @@ List MLTLCA_poly_includeall(arma::mat mY, arma::mat mDesign, arma::vec vNj, arma
     mGamma.col(m) = mGammafoo.col(m).subvec(1,iT-1);
   }
   //
-  double Terr_high = iJ*accu(-vOmega%log(vOmega));
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
+  arma::vec vPW = mean(mPW).t();
+  double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
-  
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   
@@ -3576,19 +3650,29 @@ List MLTLCA_covlowhigh_poly(arma::mat mY, arma::mat mZ, arma::mat mZh, arma::vec
   AIC = -2.0*LLKSeries(iter-1) + 2.0*(iT*nfreepar_res + (iT - 1.0)*iP*iM + (iM - 1.0)*iPh);
   
   // computing log-linear parameters
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
   arma::vec vPW = mean(mPW).t();
   double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   double ICL_BIClow;
@@ -3688,11 +3772,11 @@ List MLTLCA_covlowhigh_poly(arma::mat mY, arma::mat mZ, arma::mat mZh, arma::vec
   // asymptotic SEs correction
   int uncondLatpars   = (iM-1) + (iT-1)*iM;
   int parsfree        = (iT - 1)*iP*iM + (iM - 1)*iPh;
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16); 
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + nfreepar_res-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + nfreepar_res-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -4006,19 +4090,29 @@ List MLTLCA_cov_poly(arma::mat mY, arma::mat mZ, arma::vec vNj, arma::vec vOmega
   arma::vec vDelta(iM-1);
   vDelta = vDeltafoo.subvec(1,iM-1);
   
-  double Terr_high = iJ*accu(-vOmega%log(vOmega));
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
+  arma::vec vPW = mean(mPW).t();
+  double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
-  
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   
@@ -4116,11 +4210,11 @@ List MLTLCA_cov_poly(arma::mat mY, arma::mat mZ, arma::vec vNj, arma::vec vOmega
   if(nsteps == 3){
     nfreepar_res = 0;
   }
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + nfreepar_res-1,uncondLatpars + nfreepar_res-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16);
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + nfreepar_res-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + nfreepar_res-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -4318,6 +4412,10 @@ List MLTLCA_poly(arma::mat mY, arma::vec vNj, arma::vec vOmega, arma::mat mPi, a
         mPMsumX.col(t) = foovec;
       }
     }
+    for(m = 0; m < iM; m++){
+      mPi_Next.col(m) = OmegaCheck(mPi_Next.col(m), iT);
+    }
+    vOmega_Next = OmegaCheck(vOmega_Next, iM);
     
     LLKSeries(iter) = accu(vLLK);
     if(iter > 10){
@@ -4472,19 +4570,29 @@ List MLTLCA_poly(arma::mat mY, arma::vec vNj, arma::vec vOmega, arma::mat mPi, a
     mGamma.col(m) = mGammafoo.col(m).subvec(1,iT-1);
   }
   //
-  double Terr_high = iJ*accu(-vOmega%log(vOmega));
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
+  arma::vec vPW = mean(mPW).t();
+  double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
-  
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   
@@ -4890,20 +4998,29 @@ List MLTLCA_covlowhigh(arma::mat mY, arma::mat mZ, arma::mat mZh, arma::vec vNj,
   
   // computing log-linear parameters
   
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
   arma::vec vPW = mean(mPW).t();
   double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
-  
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   
@@ -4941,11 +5058,11 @@ List MLTLCA_covlowhigh(arma::mat mY, arma::mat mZ, arma::mat mZh, arma::vec vNj,
   // asymptotic SEs correction
   int uncondLatpars   = (iM-1) + (iT-1)*iM;
   int parsfree        = (iT - 1)*iP*iM + (iM - 1)*iPh;
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + (iT*iK)-1,uncondLatpars + (iT*iK)-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + (iT*iK)-1,uncondLatpars + (iT*iK)-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16); 
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + (iT*iK)-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + (iT*iK)-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -5223,22 +5340,31 @@ List MLTLCA_cov(arma::mat mY, arma::mat mZ, arma::vec vNj, arma::vec vOmega_star
   arma::vec vDelta(iM-1);
   vDelta = vDeltafoo.subvec(1,iM-1);
   
-  double Terr_high = iJ*accu(-vOmega%log(vOmega));
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
+  arma::vec vPW = mean(mPW).t();
+  double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
-  
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
-  
   
   double ICL_BIClow;
   double ICL_BIChigh;
@@ -5270,11 +5396,11 @@ List MLTLCA_cov(arma::mat mY, arma::mat mZ, arma::vec vNj, arma::vec vOmega_star
   // asymptotic SEs correction
   int uncondLatpars   = (iM-1) + (iT-1)*iM;
   int parsfree        = (iT - 1)*iP*iM + (iM - 1);
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + (iT*iK)-1,uncondLatpars + (iT*iK)-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + (iT*iK)-1,uncondLatpars + (iT*iK)-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16); 
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + (iT*iK)-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + (iT*iK)-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -5448,6 +5574,10 @@ List MLTLCA(arma::mat mY, arma::vec vNj, arma::vec vOmega, arma::mat mPi, arma::
         mPMsumX.col(t) = foovec;
       }
     }
+    for(m = 0; m < iM; m++){
+      mPi_Next.col(m) = OmegaCheck(mPi_Next.col(m), iT);
+    }
+    vOmega_Next = OmegaCheck(vOmega_Next, iM);
     
     LLKSeries(iter) = accu(vLLK);
     if(iter > 10){
@@ -5600,19 +5730,29 @@ List MLTLCA(arma::mat mY, arma::vec vNj, arma::vec vOmega, arma::mat mPi, arma::
     mGamma.col(m) = mGammafoo.col(m).subvec(1,iT-1);
   }
   // 
-  double Terr_high = iJ*accu(-vOmega%log(vOmega));
+  arma::vec vPosthigh(iM);
+  for(j = 0; j < iJ; j++){
+    vPosthigh = PostCheck(mPW.row(j).t(),iM);
+    mPW.row(j) = vPosthigh.t();
+  }
+  mlogPW = log(mPW);
+  arma::vec vPW = mean(mPW).t();
+  double Terr_high = iJ*accu(-vPW%log(vPW));
   mlogPW.elem( find_nonfinite(mlogPW) ).zeros();
+  mlogPW.elem( find_nan(mlogPW) ).zeros();
   double Perr_high = accu(-mPW%mlogPW);
   double R2entr_high = 1.0-(Perr_high/Terr_high);
-  
   arma::mat mPXmarg = sum(cPMX,2);
+  arma::vec vFooPos(iT);
   for(n = 0; n< iN; n++){
-    mPXmarg.row(n) = mPXmarg.row(n)/accu(mPXmarg.row(n));
+    vFooPos = PostCheck( mPXmarg.row(n).t(),iT);
+    mPXmarg.row(n) = vFooPos.t();
   }
   arma::vec vPimarg = mean(mPXmarg).t();
   double Terr_low = iN*accu(-vPimarg%log(vPimarg));
   arma::mat mlogPXmarg = log(mPXmarg);
   mlogPXmarg.elem(find_nonfinite(mlogPXmarg) ).zeros();
+  mlogPXmarg.elem(find_nan(mlogPXmarg) ).zeros();
   double Perr_low = accu(-mPXmarg%mlogPXmarg);
   double R2entr_low = (Terr_low - Perr_low)/Terr_low;
   

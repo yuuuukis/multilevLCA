@@ -49,6 +49,10 @@ multiLCA = function(data, Y, iT,
   }
   approach  = check_inputs2(data,Y,iT,id_high,iM,Z,Zh,startval)
   
+  if(is_tibble_manual(data)){
+    data = as.data.frame(data)
+  }
+  
   if(length(iT)==1&(!is.null(reord_user))){
     if(any(reord_user!=c(1:iT))){
       reord = TRUE
@@ -1168,8 +1172,8 @@ simultsel_fun = function(mY,id_high,iT,iM,kmea,maxIter,tol,reord){
     BIClow      = -2*ll + K*log(sum(vNj))
     BIChigh     = -2*ll + K*log(iN)
     AIC         = -2*ll + 2*K
-    ICL_BIClow  = Inf
-    ICL_BIChigh = Inf
+    ICL_BIClow  = BIClow
+    ICL_BIChigh = BIChigh
     outmuLCA    = list()
   }else if(iM > 1 & iT == 1){
     ll          = -Inf
@@ -1237,8 +1241,8 @@ lukosel_fun = function(mY,id_high,iT_range,iM_range,verbose,kmea,maxIter,tol,reo
       BIClow_step1[1]       = -2*llfoo + K*log(sum(vNj))
       BIChigh_step1[1]      = -2*llfoo + K*log(iN)
       AIC_step1[1]          = -2*llfoo + 2*K
-      ICL_BIClow_step1[1]   = Inf
-      ICL_BIChigh_step1[1]  = Inf
+      ICL_BIClow_step1[1]   = BIClow_step1[1] 
+      ICL_BIChigh_step1[1]  = BIChigh_step1[1]
     } else{
       LCAout                        = LCA_fast_init(mY,i,kmea,maxIter,tol,reord)
       ll                            = tail(LCAout$LLKSeries,1)
@@ -1282,7 +1286,7 @@ lukosel_fun = function(mY,id_high,iT_range,iM_range,verbose,kmea,maxIter,tol,reo
         BIChigh_step2[1]      = BIChigh_step1[1+iT_currbest-iT_min]
         AIC_step2[1]          = AIC_step1[1+iT_currbest-iT_min]
         ICL_BIClow_step2[1]   = ICL_BIClow_step1[1+iT_currbest-iT_min]
-        ICL_BIChigh_step2[1]  = ICL_BIClow_step1[1+iT_currbest-iT_min]
+        ICL_BIChigh_step2[1]  = ICL_BIChigh_step1[1+iT_currbest-iT_min]
       } else{
         start     = meas_Init(mY,id_high,vNj,i,iT_currbest,kmea,maxIter,tol,reord)
         vOmegast  = start$vOmega_start
@@ -1383,8 +1387,8 @@ sel_other = function(mY,id_high,iT_range,iM_range,approach,verbose,kmea,maxIter,
           if(is.null(iM_range)) BIClow[1] = -2*llfoo + K*log(nrow(mY))
           if(!is.null(iM_range)) BIChigh[1] = -2*llfoo + K*log(iN)
           AIC[1]          = -2*llfoo + 2*K
-          ICL_BIClow[1]   = Inf
-          ICL_BIChigh[1]  = Inf
+          ICL_BIClow[1]   = BIClow[1]
+          ICL_BIChigh[1]  = BIChigh[1]
         } else{
           outmuLCA[[1+i-iT_min]]  = LCA_fast_init(mY,i,kmea,maxIter,tol,reord)
           ll                      = tail(outmuLCA[[1+i-iT_min]]$LLKSeries,1)
@@ -1487,8 +1491,8 @@ simultsel_fun_poly = function(mY,mDesign,id_high,iT,iM,ivItemcat,kmea,maxIter,to
     BIClow      = -2*ll + K*log(sum(vNj))
     BIChigh     = -2*ll + K*log(iN)
     AIC         = -2*ll + 2*K
-    ICL_BIClow  = Inf
-    ICL_BIChigh = Inf
+    ICL_BIClow  = BIClow
+    ICL_BIChigh = BIChigh
     outmuLCA    = list()
   }else if(iM > 1 & iT == 1){
     ll          = -Inf
@@ -1564,8 +1568,8 @@ lukosel_fun_poly = function(mY,mDesign,id_high,iT_range,iM_range,ivItemcat,verbo
       BIClow_step1[1]       = -2*llfoo + K*log(sum(vNj))
       BIChigh_step1[1]      = -2*llfoo + K*log(iN)
       AIC_step1[1]          = -2*llfoo + 2*K
-      ICL_BIClow_step1[1]   = Inf
-      ICL_BIChigh_step1[1]  = Inf
+      ICL_BIClow_step1[1]   = BIClow_step1[1]
+      ICL_BIChigh_step1[1]  = BIChigh_step1[1]
     } else{
       LCAout                        = LCA_fast_init_poly(mY,i,ivItemcat,incomplete,kmea,maxIter,tol,reord)
       ll                            = tail(LCAout$LLKSeries,1)
@@ -1609,7 +1613,7 @@ lukosel_fun_poly = function(mY,mDesign,id_high,iT_range,iM_range,ivItemcat,verbo
         BIChigh_step2[1]      = BIChigh_step1[1+iT_currbest-iT_min]
         AIC_step2[1]          = AIC_step1[1+iT_currbest-iT_min]
         ICL_BIClow_step2[1]   = ICL_BIClow_step1[1+iT_currbest-iT_min]
-        ICL_BIChigh_step2[1]  = ICL_BIClow_step1[1+iT_currbest-iT_min]
+        ICL_BIChigh_step2[1]  = ICL_BIChigh_step1[1+iT_currbest-iT_min]
       } else{
         start     = meas_Init_poly(mY,id_high,vNj,i,iT_currbest,ivItemcat,incomplete,kmea,maxIter,tol,reord)
         vOmegast  = start$vOmega_start
@@ -1667,7 +1671,7 @@ lukosel_fun_poly = function(mY,mDesign,id_high,iT_range,iM_range,ivItemcat,verbo
     iT_currbest     = which(BIClow_step3==min(BIClow_step3,na.rm=T))+iT_min-1
     outmuLCA_step3  = outmuLCA3[[1+iT_currbest-iT_min]]
   } else{
-    outmuLCA_step3 = LCAout
+    outmuLCA_step3 = LCA_fast_init_poly(mY,iT_currbest,ivItemcat,incomplete,kmea,maxIter,tol,reord)
   }
   return(list(outmuLCA_step3=outmuLCA_step3,iT_opt=iT_currbest, iM_opt=iM_currbest, 
               BIClow_step1 = BIClow_step1, BIChigh_step1 = BIChigh_step1, AIC_step1 = AIC_step1,
@@ -1721,8 +1725,8 @@ sel_other_poly = function(mY,mDesign,id_high,iT_range,iM_range,ivItemcat,approac
           if(is.null(iM_range)) BIClow[1] = -2*llfoo + K*log(nrow(mY))
           if(!is.null(iM_range)) BIChigh[1] = -2*llfoo + K*log(iN)
           AIC[1]          = -2*llfoo + 2*K
-          ICL_BIClow[1]   = Inf
-          ICL_BIChigh[1]  = Inf
+          ICL_BIClow[1]   = BIClow[1]
+          ICL_BIChigh[1]  = BIChigh[1]
         } else{
           outmuLCA[[1+i-iT_min]]  = LCA_fast_init_poly(mY,i,ivItemcat,incomplete,kmea,maxIter,tol,reord)
           ll                      = tail(outmuLCA[[1+i-iT_min]]$LLKSeries,1)
@@ -3463,6 +3467,10 @@ check_inputs2 = function(data,Y,iT,id_high,iM,Z,Zh,startval){
   
   return(approach)
   
+}
+#
+is_tibble_manual = function(x) {
+  return(inherits(x, "tbl_df") && inherits(x, "tbl") && inherits(x, "data.frame"))
 }
 #
 #

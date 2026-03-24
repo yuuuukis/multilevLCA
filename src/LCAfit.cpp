@@ -163,7 +163,7 @@ List LCA_fast_poly_includeall(arma::mat mY, arma::mat mDesign, arma::ivec ivFreq
   double BIC, AIC;
   BIC = -2.0*LLKSeries(iter-1) + log(iNtot)*(iK*nfreepar_res + (iK - 1));
   AIC = -2.0*LLKSeries(iter-1) + 2*(iK*nfreepar_res + (iK - 1));
-  double Terr = accu(-pg%log(pg));
+  double Terr = accu(-pg%trunc_log(pg));
   arma::mat mlogU = trunc_log(mU);
   double Perr = sum(sum(-mU%mlogU,1)%ivFreq)/iNtot;
   double R2entr = (Terr - Perr)/Terr;
@@ -429,10 +429,12 @@ List LCAcov_poly_includeall(arma::mat mY, arma::mat mDesign, arma::mat mZ, int i
   BIC = -2.0*LLKSeries(iter-1) + log(NT)*1.0*(iK*nfreepar_res + (iK - 1));
   AIC = -2.0*LLKSeries(iter-1) + 2.0*(iK*nfreepar_res + (iK - 1));
   // double Terr = accu(-mPg%log(mPg));
-  arma::vec vPg = mean(mU).t();
-  double Terr = accu(-vPg%log(vPg));
   arma::mat mlogU = trunc_log(mU);
-  double Perr = mean(sum(-mU%mlogU,1));
+  arma::vec vPg = mean(mU).t();
+  double Terr = iN*accu(-vPg%log(vPg));
+  mlogU.elem(find_nonfinite(mlogU) ).zeros();
+  mlogU.elem(find_nan(mlogU) ).zeros();
+  double Perr = accu(-mU%mlogU);
   double R2entr = (Terr - Perr)/Terr;
   
   /// classification error
@@ -504,11 +506,11 @@ List LCAcov_poly_includeall(arma::mat mY, arma::mat mDesign, arma::mat mZ, int i
   // Matrix formula
   int uncondLatpars   = iK - 1;
   int parsfree        = (iK - 1)*iP;
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + (iK*nfreepar_res)-1,uncondLatpars + (iK*nfreepar_res)-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + (iK*nfreepar_res)-1,uncondLatpars + (iK*nfreepar_res)-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16); 
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + (iK*nfreepar_res)-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + (iK*nfreepar_res)-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -715,10 +717,12 @@ List LCAcov_poly(arma::mat mY, arma::mat mZ, int iK, arma::mat mPhi, arma::mat m
   BIC = -2.0*LLKSeries(iter-1) + log(NT)*1.0*(iK*nfreepar_res + (iK - 1));
   AIC = -2.0*LLKSeries(iter-1) + 2.0*(iK*nfreepar_res + (iK - 1));
   // double Terr = accu(-mPg%log(mPg));
-  arma::vec vPg = mean(mU).t();
-  double Terr = accu(-vPg%log(vPg));
   arma::mat mlogU = trunc_log(mU);
-  double Perr = mean(sum(-mU%mlogU,1));
+  arma::vec vPg = mean(mU).t();
+  double Terr = iN*accu(-vPg%log(vPg));
+  mlogU.elem(find_nonfinite(mlogU) ).zeros();
+  mlogU.elem(find_nan(mlogU) ).zeros();
+  double Perr = accu(-mU%mlogU);
   double R2entr = (Terr - Perr)/Terr;
   
   /// classification error
@@ -791,11 +795,11 @@ List LCAcov_poly(arma::mat mY, arma::mat mZ, int iK, arma::mat mPhi, arma::mat m
   // Matrix formula
   int uncondLatpars   = iK - 1;
   int parsfree        = (iK - 1)*iP;
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + (iK*nfreepar_res)-1,uncondLatpars + (iK*nfreepar_res)-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + (iK*nfreepar_res)-1,uncondLatpars + (iK*nfreepar_res)-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16); 
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + (iK*nfreepar_res)-1);
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + (iK*nfreepar_res)-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
   arma::vec SEs_cor =  SEs_unc;
@@ -988,7 +992,7 @@ List LCA_fast_poly(arma::mat mY, arma::ivec ivFreq, int iK, arma::mat mU, arma::
   double BIC, AIC;
   BIC = -2.0*LLKSeries(iter-1) + log(iNtot)*(iK*nfreepar_res + (iK - 1));
   AIC = -2.0*LLKSeries(iter-1) + 2*(iK*nfreepar_res + (iK - 1));
-  double Terr = accu(-pg%log(pg));
+  double Terr = accu(-pg%trunc_log(pg));
   arma::mat mlogU = trunc_log(mU);
   double Perr = sum(sum(-mU%mlogU,1)%ivFreq)/iNtot;
   double R2entr = (Terr - Perr)/Terr;
@@ -1254,10 +1258,12 @@ List LCAcov(arma::mat mY, arma::mat mZ, int iK, arma::mat mPhi, arma::mat mBeta,
   BIC = -2.0*LLKSeries(iter-1) + log(NT)*(iH*iK + (iK - 1));
   AIC = -2.0*LLKSeries(iter-1) + 2*(iH*iK + (iK - 1));
   // double Terr = accu(-mPg%log(mPg));
-  arma::vec vPg = mean(mU).t();
-  double Terr = accu(-vPg%log(vPg));
   arma::mat mlogU = trunc_log(mU);
-  double Perr = mean(sum(-mU%mlogU,1));
+  arma::vec vPg = mean(mU).t();
+  double Terr = iN*accu(-vPg%log(vPg));
+  mlogU.elem(find_nonfinite(mlogU) ).zeros();
+  mlogU.elem(find_nan(mlogU) ).zeros();
+  double Perr = accu(-mU%mlogU);
   double R2entr = (Terr - Perr)/Terr;
   
   /// classification error
@@ -1307,13 +1313,15 @@ List LCAcov(arma::mat mY, arma::mat mZ, int iK, arma::mat mPhi, arma::mat mBeta,
   // Matrix formula
   int uncondLatpars   = iK - 1;
   int parsfree        = (iK - 1)*iP;
-  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars-1,uncondLatpars-1,uncondLatpars + (iK*iH)-1,uncondLatpars + (iK*iH)-1);
+  arma::mat mSigma11  = mStep1Var.submat(uncondLatpars,uncondLatpars,uncondLatpars + (iK*iH)-1,uncondLatpars + (iK*iH)-1);
   arma::mat mV2       = Varmat.submat(0,0,parsfree-1,parsfree-1);
   arma::mat mJmat     = Infomat.submat(0,0,parsfree-1,parsfree-1);
-  arma::mat mJmatInv  = psinv(mJmat,1000,2.220446e-16); 
-  arma::mat mH        = Infomat.submat(0,parsfree-1,parsfree-1,parsfree + (iK*iH)-1);
+  arma::mat mJmatInv  = psinv(mJmat,1000,3.308722e-24);
+  // arma::mat mJmatInv  = pinv(mJmat); 
+  arma::mat mH        = Infomat.submat(0,parsfree,parsfree-1,parsfree + (iK*iH)-1);
   arma::mat mQ        =  mJmatInv*mH*mSigma11*mH.t()*mJmatInv;
   arma::mat mVar_corr = mV2 + mQ;
+  mVar_corr           = symmatu(mVar_corr);
   arma::vec SEs_cor =  SEs_unc;
   if(fixed == 1){
     SEs_cor.subvec(0,parsfree-1) = sqrt(mVar_corr.diag());
@@ -1451,7 +1459,7 @@ List LCA(arma::mat mY, int iK, arma::mat mU, arma::vec reord_user, int maxIter =
   double BIC, AIC;
   BIC = -2.0*LLKSeries(iter-1) + log(NT)*(iH*iK + (iK - 1));
   AIC = -2.0*LLKSeries(iter-1) + 2*(iH*iK + (iK - 1));
-  double Terr = accu(-pg%log(pg));
+  double Terr = accu(-pg%trunc_log(pg));
   arma::mat mlogU = trunc_log(mU);
   double Perr = mean(sum(-mU%mlogU,1));
   double R2entr = (Terr - Perr)/Terr;
@@ -1598,7 +1606,7 @@ List LCA_fast(arma::mat mY, arma::ivec ivFreq, int iK, arma::mat mU, arma::vec r
   double BIC, AIC;
   BIC = -2.0*LLKSeries(iter-1) + log(iNtot)*(iH*iK + (iK - 1));
   AIC = -2.0*LLKSeries(iter-1) + 2*(iH*iK + (iK - 1));
-  double Terr = accu(-pg%log(pg));
+  double Terr = accu(-pg%trunc_log(pg));
   arma::mat mlogU = trunc_log(mU);
   double Perr = sum(sum(-mU%mlogU,1)%ivFreq)/iNtot;
   double R2entr = (Terr - Perr)/Terr;
