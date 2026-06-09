@@ -3151,26 +3151,26 @@ List MLTLCA_poly_includeall(arma::mat mY, arma::mat mDesign, arma::vec vNj, arma
     for(t=0; t< iT; t++){
       ifoo               = low_order(t);
       mPhi_sorted.col(t) = mPhi.col(ifoo);
-      mPMsumX_sorted.col(t)  = mPMsumX_sorted.col(ifoo);
-      mLogdKY_sorted.col(t)  = mLogdKY_sorted.col(ifoo);
+      mPMsumX_sorted.col(t)  = mPMsumX.col(ifoo);
+      mLogdKY_sorted.col(t)  = mLogdKY.col(ifoo);
       for(m = 0; m < iM; m++){
         ifoo =  mLow_order(t,m);
         mPi_sorted(t,m)    = mPi(ifoo,m);
-        cPX_sorted.slice(m).col(t)  = cPX_sorted.slice(m).col(ifoo);
-        clogPX_sorted.slice(m).col(t)  = clogPX_sorted.slice(m).col(ifoo);
-        cPMX_sorted.slice(m).col(t)  = cPMX_sorted.slice(m).col(ifoo);
-        clogPMX_sorted.slice(m).col(t)  = clogPMX_sorted.slice(m).col(ifoo);
+        cPX_sorted.slice(m).col(t)  = cPX.slice(m).col(ifoo);
+        clogPX_sorted.slice(m).col(t)  = clogPX.slice(m).col(ifoo);
+        cPMX_sorted.slice(m).col(t)  = cPMX.slice(m).col(ifoo);
+        clogPMX_sorted.slice(m).col(t)  = clogPMX.slice(m).col(ifoo);
       }
     }
     for(m = 0; m < iM; m++){
       ifoo_high = high_order(m);
       vOmega_sorted(m) = vOmega(ifoo_high);
       mPi_sorted.col(m)  = mPi.col(ifoo_high);
-      cPX_sorted.slice(m)  = cPX_sorted.slice(ifoo_high);
-      clogPX_sorted.slice(m)  = clogPX_sorted.slice(ifoo_high);
-      cPMX_sorted.slice(m)  = cPMX_sorted.slice(ifoo_high);
-      clogPMX_sorted.slice(m)  = clogPMX_sorted.slice(ifoo_high);
-      mSumPX_sorted.col(m)  = mSumPX_sorted.col(ifoo_high);
+      cPX_sorted.slice(m)  = cPX.slice(ifoo_high);
+      clogPX_sorted.slice(m)  = clogPX.slice(ifoo_high);
+      cPMX_sorted.slice(m)  = cPMX.slice(ifoo_high);
+      clogPMX_sorted.slice(m)  = clogPMX.slice(ifoo_high);
+      mSumPX_sorted.col(m)  = mSumPX.col(ifoo_high);
     }
     vOmega = vOmega_sorted;
     mPhi = mPhi_sorted;
@@ -4515,26 +4515,26 @@ List MLTLCA_poly(arma::mat mY, arma::vec vNj, arma::vec vOmega, arma::mat mPi, a
     for(t=0; t< iT; t++){
       ifoo               = low_order(t);
       mPhi_sorted.col(t) = mPhi.col(ifoo);
-      mPMsumX_sorted.col(t)  = mPMsumX_sorted.col(ifoo);
-      mLogdKY_sorted.col(t)  = mLogdKY_sorted.col(ifoo);
+      mPMsumX_sorted.col(t)  = mPMsumX.col(ifoo);
+      mLogdKY_sorted.col(t)  = mLogdKY.col(ifoo);
       for(m = 0; m < iM; m++){
         ifoo =  mLow_order(t,m);
         mPi_sorted(t,m)    = mPi(ifoo,m);
-        cPX_sorted.slice(m).col(t)  = cPX_sorted.slice(m).col(ifoo);
-        clogPX_sorted.slice(m).col(t)  = clogPX_sorted.slice(m).col(ifoo);
-        cPMX_sorted.slice(m).col(t)  = cPMX_sorted.slice(m).col(ifoo);
-        clogPMX_sorted.slice(m).col(t)  = clogPMX_sorted.slice(m).col(ifoo);
+        cPX_sorted.slice(m).col(t)  = cPX.slice(m).col(ifoo);
+        clogPX_sorted.slice(m).col(t)  = clogPX.slice(m).col(ifoo);
+        cPMX_sorted.slice(m).col(t)  = cPMX.slice(m).col(ifoo);
+        clogPMX_sorted.slice(m).col(t)  = clogPMX.slice(m).col(ifoo);
       }
     }
     for(m = 0; m < iM; m++){
       ifoo_high = high_order(m);
       vOmega_sorted(m) = vOmega(ifoo_high);
       mPi_sorted.col(m)  = mPi.col(ifoo_high);
-      cPX_sorted.slice(m)  = cPX_sorted.slice(ifoo_high);
-      clogPX_sorted.slice(m)  = clogPX_sorted.slice(ifoo_high);
-      cPMX_sorted.slice(m)  = cPMX_sorted.slice(ifoo_high);
-      clogPMX_sorted.slice(m)  = clogPMX_sorted.slice(ifoo_high);
-      mSumPX_sorted.col(m)  = mSumPX_sorted.col(ifoo_high);
+      cPX_sorted.slice(m)  = cPX.slice(ifoo_high);
+      clogPX_sorted.slice(m)  = clogPX.slice(ifoo_high);
+      cPMX_sorted.slice(m)  = cPMX.slice(ifoo_high);
+      clogPMX_sorted.slice(m)  = clogPMX.slice(ifoo_high);
+      mSumPX_sorted.col(m)  = mSumPX.col(ifoo_high);
     }
     vOmega = vOmega_sorted;
     mPhi = mPhi_sorted;
@@ -5677,26 +5677,26 @@ List MLTLCA(arma::mat mY, arma::vec vNj, arma::vec vOmega, arma::mat mPi, arma::
     for(t=0; t< iT; t++){
       ifoo               = low_order(t);
       mPhi_sorted.col(t) = mPhi.col(ifoo);
-      mPMsumX_sorted.col(t)  = mPMsumX_sorted.col(ifoo);
-      mLogdKY_sorted.col(t)  = mLogdKY_sorted.col(ifoo);
+      mPMsumX_sorted.col(t)  = mPMsumX.col(ifoo);
+      mLogdKY_sorted.col(t)  = mLogdKY.col(ifoo);
       for(m = 0; m < iM; m++){
         ifoo =  mLow_order(t,m);
         mPi_sorted(t,m)    = mPi(ifoo,m);
-        cPX_sorted.slice(m).col(t)  = cPX_sorted.slice(m).col(ifoo);
-        clogPX_sorted.slice(m).col(t)  = clogPX_sorted.slice(m).col(ifoo);
-        cPMX_sorted.slice(m).col(t)  = cPMX_sorted.slice(m).col(ifoo);
-        clogPMX_sorted.slice(m).col(t)  = clogPMX_sorted.slice(m).col(ifoo);
+        cPX_sorted.slice(m).col(t)  = cPX.slice(m).col(ifoo);
+        clogPX_sorted.slice(m).col(t)  = clogPX.slice(m).col(ifoo);
+        cPMX_sorted.slice(m).col(t)  = cPMX.slice(m).col(ifoo);
+        clogPMX_sorted.slice(m).col(t)  = clogPMX.slice(m).col(ifoo);
       }
     }
     for(m = 0; m < iM; m++){
       ifoo_high = high_order(m);
       vOmega_sorted(m) = vOmega(ifoo_high);
       mPi_sorted.col(m)  = mPi.col(ifoo_high);
-      cPX_sorted.slice(m)  = cPX_sorted.slice(ifoo_high);
-      clogPX_sorted.slice(m)  = clogPX_sorted.slice(ifoo_high);
-      cPMX_sorted.slice(m)  = cPMX_sorted.slice(ifoo_high);
-      clogPMX_sorted.slice(m)  = clogPMX_sorted.slice(ifoo_high);
-      mSumPX_sorted.col(m)  = mSumPX_sorted.col(ifoo_high);
+      cPX_sorted.slice(m)  = cPX.slice(ifoo_high);
+      clogPX_sorted.slice(m)  = clogPX.slice(ifoo_high);
+      cPMX_sorted.slice(m)  = cPMX.slice(ifoo_high);
+      clogPMX_sorted.slice(m)  = clogPMX.slice(ifoo_high);
+      mSumPX_sorted.col(m)  = mSumPX.col(ifoo_high);
     }
     vOmega = vOmega_sorted;
     mPhi = mPhi_sorted;
